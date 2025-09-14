@@ -1,18 +1,21 @@
 <template>
     <section class="card transactions">
         <h2>Recent transactions</h2>
-        <ul>
-            <li v-for="t in transactions" :key="t.id" class="transaction">
-                <div class="info">
-                    <span class="desc">{{ t.description }}</span>
-                    <span class="date">{{ t.date }}</span>
-                </div>
-                <div class="value" :class="{ negative: t.amount < 0, positive: t.amount > 0 }">
-                    {{ formatCurrency(t.amount) }}
-                </div>
-            </li>
-        </ul>
-        <button class="more">View all</button>
+        <div v-if="transactions && transactions.length > 0">
+            <ul>
+                <li v-for="t in transactions" :key="t.id" class="transaction">
+                    <div class="info">
+                        <span class="desc">{{ t.description }}</span>
+                        <span class="date">{{ t.date }}</span>
+                    </div>
+                    <div class="value" :class="{ negative: t.amount < 0, positive: t.amount > 0 }">
+                        {{ formatCurrency(t.amount) }}
+                    </div>
+                </li>
+            </ul>
+            <button class="more">View all</button>
+        </div>
+        <p v-else>No recent transactions</p>
     </section>
 </template>
 

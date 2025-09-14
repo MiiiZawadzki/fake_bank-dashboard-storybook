@@ -1,11 +1,12 @@
 <template>
   <section class="card options">
     <h2>Quick actions</h2>
-    <div class="options-grid">
+    <div v-if="options && options.length > 0" class="options-grid">
       <button v-for="o in options" :key="o.id" class="option-btn">
         {{ o.name }}
       </button>
     </div>
+    <p v-else class="no-options-text">No actions available</p>
   </section>
 </template>
 

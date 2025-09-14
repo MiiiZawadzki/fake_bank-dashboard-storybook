@@ -63,26 +63,52 @@ const props = defineProps({
 
 })
 
-const { width, height, margin, data } = props
+const hasData = computed(() => props.data && props.data.length > 0);
 
-const maxValue = computed(() => Math.max(...data))
+const maxValue = computed(() => {
+  return hasData.value ? Math.max(...props.data) : 0;
+});
 
 const yStepValue = computed(() => {
-  const roughStep = maxValue.value / 7
-  const pow10 = Math.pow(10, Math.floor(Math.log10(roughStep)))
-  return Math.ceil(roughStep / pow10) * pow10
-})
+  if (!hasData.value || maxValue.value === 0) return 1;
+  const roughStep = maxValue.value / 7;
+  const pow10 = Math.pow(10, Math.floor(Math.log10(roughStep)));
+  return Math.ceil(roughStep / pow10) * pow10;
+});
 
-const ySteps = computed(() => Math.ceil(maxValue.value / yStepValue.value))
-const gridStep = computed(() => (height - 2 * margin) / ySteps.value)
-const scale = computed(() => (height - 2 * margin) / (ySteps.value * yStepValue.value))
-const xStep = computed(() => (width - 2 * margin) / (data.length - 1))
+const ySteps = computed(() => {
+  if (yStepValue.value === 0) return 0;
+  return Math.ceil(maxValue.value / yStepValue.value);
+});
 
-const linePoints = computed(() =>
-  data
-    .map((v, i) => `${margin + i * xStep.value},${height - margin - v * scale.value}`)
-    .join(" ")
-)
+const gridStep = computed(() =>
+  ySteps.value > 0 ? (props.height - 2 * props.margin) / ySteps.value : 0
+);
+
+const scale = computed(() => {
+  const totalValue = ySteps.value * yStepValue.value;
+  return totalValue > 0
+    ? (props.height - 2 * props.margin) / totalValue
+    : 0;
+});
+
+const xStep = computed(() => {
+  if (props.data.length > 1) {
+    return (props.width - 2 * props.margin) / (props.data.length - 1);
+  }
+  return 0;
+});
+
+const linePoints = computed(() => {
+  if (props.data.length < 2) return "";
+  return props.data
+    .map(
+      (v, i) =>
+        `${props.margin + i * xStep.value},${props.height - props.margin - v * scale.value
+        }`
+    )
+    .join(" ");
+});
 </script>
 
 <style scoped>
