@@ -1,12 +1,30 @@
 <template>
-    <div class="dashboard">
-        <NavBar :name="user.name" :initials="user.initials" />
+    <div v-if="isLoading" class="grid">
+        <div class="card balance">
+            <small style="color: grey;">Loading data ...</small>
+        </div>
+        <div class="card options">
+            <small style="color: grey;">Loading data ...</small>
+        </div>
+        <div class="card transactions" style="height: 300px">
+            <small style="color: grey;">Loading data ...</small>
+        </div>
+        <div class="card chart" style="height: 300px">
+            <small style="color: grey;">Loading data ...</small>
+        </div>
+    </div>
+    <div v-else-if="hasError">
+        <p class="error">An error occurred while loading dahboard data</p>
+    </div>
+    <div v-else class="dashboard">
+        <NavBar v-if="user" :name="user.name" :initials="user.initials" />
 
         <main class="content">
             <div class="grid">
-                <BalanceCard :balance="balance" class="balance" />
-                <OptionsCard :options="options" class="options" />
-                <TransactionsCard :transactions="transactions" :currency="balance.currency" class="transactions" />
+                <BalanceCard v-if="balance" :balance="balance" class="balance" />
+                <OptionsCard v-if="options" :options="options" class="options" />
+                <TransactionsCard v-if="transactions" :transactions="transactions" :currency="balance.currency"
+                    class="transactions" />
 
                 <ChartCard class="" />
             </div>
@@ -15,29 +33,19 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-
 import NavBar from "../components/NavBar.vue";
 import BalanceCard from "../components/BalanceCard.vue";
 import TransactionsCard from "../components/TransactionsCard.vue";
 import OptionsCard from "../components/OptionsCard.vue";
-
-import balanceData from "../data/balance.json";
-import transactionsData from "../data/transactions.json";
-import optionsData from "../data/options.json";
-import userData from "../data/user.json";
 import ChartCard from "../components/ChartCard.vue";
 
-const balance = ref({ currency: "USD", amount: 0 });
-const user = ref({ name: "", initials: "" });
-const transactions = ref([]);
-const options = ref([]);
-
-onMounted(() => {
-    balance.value = balanceData;
-    transactions.value = transactionsData;
-    options.value = optionsData;
-    user.value = userData;
+defineProps({
+    user: { type: Object, required: true },
+    balance: { type: Object, required: true },
+    transactions: { type: Array, required: true },
+    options: { type: Array, required: true },
+    isLoading: { type: Boolean, default: false },
+    hasError: { type: Boolean, default: false },
 });
 </script>
 
@@ -81,6 +89,14 @@ onMounted(() => {
 .options {
     grid-column: 1;
     grid-row: 2;
+}
+
+.error {
+    color: #ce0000;
+    background-color: #ffefef;
+    padding: 5%;
+    border-radius: 20px;
+    text-align: center;
 }
 
 @media (max-width: 768px) {
